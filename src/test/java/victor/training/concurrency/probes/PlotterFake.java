@@ -29,6 +29,7 @@ public class PlotterFake implements Plotter {
          callingThreads.add(Thread.currentThread().getName());
          if (callingThreads.size() >= 2) {
             System.err.println("PLOTTER ERROR: received more than 1 parallel requests, from threads: " + callingThreads);
+            System.err.println("STOP PROCESS");
             System.exit(1);
          }
       }
@@ -54,6 +55,7 @@ public class PlotterFake implements Plotter {
       if (plotterAcceptsOnlyPages) {
          if (samples.size() != 5) {
             System.err.println("PLOTTER ERROR: received a page of size != 5: " + samples);
+            System.err.println("STOP PROCESS");
             System.exit(2);
          }
       }
@@ -63,6 +65,7 @@ public class PlotterFake implements Plotter {
       for (Sample sample : samples) {
          if (lastSampleTime.isAfter(sample.getTimestamp())) {
             System.err.println("PLOTTER ERROR: Samples received out of order.\nOffending timestamp:"+ sample.getTimestamp() + "\nis before\nlast timestamp:"+lastSampleTime);
+            System.err.println("STOP PROCESS");
             System.exit(3);
          }
          lastSampleTime = sample.getTimestamp();
