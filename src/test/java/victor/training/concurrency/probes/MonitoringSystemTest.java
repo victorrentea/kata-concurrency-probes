@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import victor.training.concurrency.probes.Probes.ValueAndDelay;
+import victor.training.concurrency.probes.ProbesFake.ValueAndDelay;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ class MonitoringSystemTest {
       List<ValueAndDelay> responses = new ArrayList<>();
       for (int i = 0; i < 10; i++) responses.add(new ValueAndDelay(i, 5));
       PlotterFake plotter = new PlotterFake(10);
-      MonitoringSystem target = new MonitoringSystem(new Probes(responses), plotter);
+      MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
       target.start(List.of("probe1"));
 
@@ -45,7 +45,7 @@ class MonitoringSystemTest {
       List<ValueAndDelay> responses = new ArrayList<>();
       for (int i = 0; i < 10; i++) responses.add(new ValueAndDelay(i, 5));
       PlotterFake plotter = new PlotterFake(10);
-      MonitoringSystem target = new MonitoringSystem(new Probes(responses), plotter);
+      MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
       target.start(List.of("probe1", "probe2", "probe3"));
 
@@ -60,7 +60,7 @@ class MonitoringSystemTest {
       for (int i = 0; i < 40; i++) responses.add(new ValueAndDelay(i, 5));
       PlotterFake plotter = new PlotterFake(10);
       plotter.detectBlockingInProbeThread = true;
-      MonitoringSystem target = new MonitoringSystem(new Probes(responses), plotter);
+      MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
       target.start(List.of("probe1", "probe2", "probe3"));
 
@@ -78,7 +78,7 @@ class MonitoringSystemTest {
       for (int i = 0; i < 40; i++) responses.add(new ValueAndDelay(LATE_VALUE, 5));
       PlotterFake plotter = new PlotterFake(100);
       plotter.detectBlockingInProbeThread = true;
-      MonitoringSystem target = new MonitoringSystem(new Probes(responses), plotter);
+      MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
       target.start(List.of("probe1", "probe2", "probe3"));
 
@@ -102,7 +102,7 @@ class MonitoringSystemTest {
       PlotterFake plotter = new PlotterFake(100);
       plotter.detectBlockingInProbeThread = true;
       plotter.plotterAcceptsOnlyPages = true;
-      MonitoringSystem target = new MonitoringSystem(new Probes(responses), plotter);
+      MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
       target.start(List.of("probe1", "probe2", "probe3"));
 

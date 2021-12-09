@@ -18,8 +18,9 @@ public class MonitoringSystem {
    private static final Logger log = LoggerFactory.getLogger(MonitoringSystem.class);
    private final Probes probes;
    private final Plotter plotter;
+
    private final Deque<Sample> pendingSamples = new ArrayDeque<>();
-   //   private final ExecutorService sendPool = Executors.newFixedThreadPool(1);
+
    private final ExecutorService sendPool = new ThreadPoolExecutor(1, 1,
        1, TimeUnit.SECONDS,
        new ArrayBlockingQueue<>(40),
@@ -53,8 +54,6 @@ public class MonitoringSystem {
             List<Sample> page = pollMany(pendingSamples, 5);
             sendPool.submit(() -> submit(page));
          }
-//      sendPool.submit(() -> sendToPlotter(List.of(sample)));
-
          probes.requestMetricFromProbe(device);
       }
    }
