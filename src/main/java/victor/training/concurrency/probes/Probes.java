@@ -2,6 +2,7 @@ package victor.training.concurrency.probes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import victor.training.concurrency.probes.Util.ThreadNamingFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Probes {
    private static final Logger log = LoggerFactory.getLogger(Probes.class);
-   private static final ScheduledExecutorService replyPool = Executors.newScheduledThreadPool(100);
+   private static final ScheduledExecutorService replyPool = Executors.newScheduledThreadPool(100,
+      new ThreadNamingFactory("probe"));
    private static final long startTime = currentTimeMillis();
    private BiConsumer<String, Integer> receiveFunction;
 

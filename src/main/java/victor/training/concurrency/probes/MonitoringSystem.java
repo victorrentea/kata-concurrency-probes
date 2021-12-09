@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MonitoringSystem {
    private static final Logger log = LoggerFactory.getLogger(MonitoringSystem.class);
-   public static final boolean PLOTTER_ACCEPTS_ONLY_PAGES = true;
    private final Probes probes;
    private final Plotter plotter;
    private final Deque<Sample> pendingSamples = new ArrayDeque<>();
@@ -33,15 +32,11 @@ public class MonitoringSystem {
       probes.setReceiveFunction(this::receive);
    }
 
-   public static void main(String[] args) {
-      new MonitoringSystem(new Probes(), new Plotter(400)).start();
-   }
-
-   public void start() {
-      log.debug("START");
-      probes.requestMetricFromProbe("probe1");
-      probes.requestMetricFromProbe("probe2");
-      probes.requestMetricFromProbe("probe3");
+   public void start(List<String> probeNames) {
+      log.debug("START " + probeNames);
+      for (String probeName : probeNames) {
+         probes.requestMetricFromProbe(probeName);
+      }
    }
 
    // is called on multiple threads by Probes driver
