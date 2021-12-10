@@ -4,10 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
+import java.util.concurrent.TimeUnit;
 
 public class MonitoringSystem {
    private static final Logger log = LoggerFactory.getLogger(MonitoringSystem.class);
@@ -17,7 +22,7 @@ public class MonitoringSystem {
        1, 1,
        1, TimeUnit.HOURS,
 //       new LinkedBlockingDeque<>()
-       new ArrayBlockingQueue<>(40),
+       new ArrayBlockingQueue<>(40 / 5),
 //       new SynchronousQueue<>(),
        new DiscardOldestPolicy()
    );
@@ -35,14 +40,41 @@ public class MonitoringSystem {
       }
    }
 
+   //   List<Sample> sampleBufferToSend = new ArrayList<>();
+   final Queue<Sample> queue = new LinkedList<>();
+
    // is called on multiple threads by Probes driver
-   public synchronized void receive(String device, int value) {
+   public void receive(String device, int value) {
       Sample sample = new Sample(LocalTime.now(), device, value);
       System.out.println("In receive");
       System.out.println(Thread.currentThread().getName());
-      pool.submit(() -> {
-         this.plotter.sendToPlotter(List.of(sample)); // 100ms
-      });
+
+      synchronized (queue) {
+         queue.offer(sample);
+         if (queue.size() > 40) {
+            queue.poll();
+         }
+         if (queue.size() == 5) {
+            List<Sample> clone = new ArrayList<>(queue);
+            queue.clear();
+
+            pool.submit(() -> submitTask(clone));
+         }
+      }
+
       probes.requestMetricFromProbe(device);
+   }
+
+   private void submitTask(List<Sample> pageOfFive) {
+      this.plotter.sendToPlotter(pageOfFive); // 100ms
+      synchronized (queue) {
+         if (queue.size() >= 5) {
+            List<Sample> pageToSend = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+               pageToSend.add(queue.poll());
+            }
+            pool.submit(() -> submitTask(pageToSend));
+         }
+      }
    }
 }

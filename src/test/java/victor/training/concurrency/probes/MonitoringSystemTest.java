@@ -103,7 +103,7 @@ class MonitoringSystemTest {
       plotter.plotterAcceptsOnlyPages = true;
       MonitoringSystem target = new MonitoringSystem(new ProbesFake(responses), plotter);
 
-      target.start(List.of("probe1", "probe2", "probe3"));
+      target.start(List.of("probe1"/*, "probe2", "probe3"*/));
 
       awaitUntilValueStabilizes(plotter::getReceivedValues, ofMillis(500));
 
