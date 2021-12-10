@@ -6,11 +6,15 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MonitoringSystem {
    private static final Logger log = LoggerFactory.getLogger(MonitoringSystem.class);
    private final Probes probes;
    private final Plotter plotter;
+   private final ExecutorService pool = Executors.newSingleThreadExecutor();
 
    public MonitoringSystem(Probes probes, Plotter plotter) {
       this.probes = probes;
@@ -30,7 +34,9 @@ public class MonitoringSystem {
       Sample sample = new Sample(LocalTime.now(), device, value);
       System.out.println("In receive");
       System.out.println(Thread.currentThread().getName());
-      this.plotter.sendToPlotter(List.of(sample));
+      pool.submit(() -> {
+         this.plotter.sendToPlotter(List.of(sample)); // 100ms
+      });
       probes.requestMetricFromProbe(device);
    }
 }
