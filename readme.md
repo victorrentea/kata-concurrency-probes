@@ -4,7 +4,7 @@ probes.requestMetricFromProbe(probeName);
 
 After that, the probe driver calls you back the method `MonitoringSystem.receive` on another thread.
 
-Once that is called you have to call again to request data to the probe.
+Once that is called you have to call again `requestMetricFromProbe` to request data from the probe.
 
 - Step1: Warmup
   * You have 1 probe: make sure you receive data and request a new sample immediately
@@ -26,7 +26,6 @@ Once that is called you have to call again to request data to the probe.
   - If too many samples arrive, discard the oldest (make the test pass)
   
 - Step5: For network efficiency, Plotter now only accepts pages of 5 samples at a time
-    - For this step, please set `PLOTTER_ACCEPTS_ONLY_PAGES` to `true` 
     - Hint: how do you accumulate a full page between threads?
     - IMPORTANT: don't mind about the previous test
 - [HARD] Make the test still pass -> manual backpressure implementation
