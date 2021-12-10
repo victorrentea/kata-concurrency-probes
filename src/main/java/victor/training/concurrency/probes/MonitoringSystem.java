@@ -6,15 +6,21 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
+import java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy;
 
 public class MonitoringSystem {
    private static final Logger log = LoggerFactory.getLogger(MonitoringSystem.class);
    private final Probes probes;
    private final Plotter plotter;
-   private final ExecutorService pool = Executors.newSingleThreadExecutor();
+   private final ExecutorService pool = new ThreadPoolExecutor(
+       1, 1,
+       1, TimeUnit.HOURS,
+//       new LinkedBlockingDeque<>()
+       new ArrayBlockingQueue<>(40),
+//       new SynchronousQueue<>(),
+       new DiscardOldestPolicy()
+   );
 
    public MonitoringSystem(Probes probes, Plotter plotter) {
       this.probes = probes;

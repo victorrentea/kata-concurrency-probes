@@ -22,7 +22,7 @@ public class PlotterFake implements Plotter {
    }
 
    @Override
-   synchronized public void sendToPlotter(List<Sample> samples) {
+   public void sendToPlotter(List<Sample> samples) {
       log.debug("SEND " + samples + " to plotter ... ");
       log.debug(Thread.currentThread().getName() + this);
       checkReceivedPage(samples);
