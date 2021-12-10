@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 
 public class MonitoringSystem {
@@ -25,9 +26,11 @@ public class MonitoringSystem {
    }
 
    // is called on multiple threads by Probes driver
-   public void receive(String device, int value) {
+   public synchronized void receive(String device, int value) {
       Sample sample = new Sample(LocalTime.now(), device, value);
-      // TODO send to plotter
-      // TODO request another sample from this device
+      System.out.println("In receive");
+      System.out.println(Thread.currentThread().getName());
+      this.plotter.sendToPlotter(List.of(sample));
+      probes.requestMetricFromProbe(device);
    }
 }

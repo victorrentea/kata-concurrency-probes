@@ -22,8 +22,9 @@ public class PlotterFake implements Plotter {
    }
 
    @Override
-   public void sendToPlotter(List<Sample> samples) {
+   synchronized public void sendToPlotter(List<Sample> samples) {
       log.debug("SEND " + samples + " to plotter ... ");
+      log.debug(Thread.currentThread().getName() + this);
       checkReceivedPage(samples);
       synchronized (callingThreads) {
          callingThreads.add(Thread.currentThread().getName());
@@ -35,7 +36,9 @@ public class PlotterFake implements Plotter {
       }
       if (detectBlockingInProbeThread) {
          if (Thread.currentThread().getName().startsWith("probe")) {
-            throw new IllegalArgumentException("You should not block in the plotter thread");
+            System.err.println("PLOTTER ERROR: You should not block in the probe thread: " + callingThreads);
+            System.err.println("STOP PROCESS");
+            System.exit(1);
          }
       }
       checkSamplesInOrder(samples);
